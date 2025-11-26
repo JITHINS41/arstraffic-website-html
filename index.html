@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Starter Site</title>
+  <meta name="description" content="A simple Tailwind CSS starter website" />
+
+  <!-- Tailwind CSS via CDN for quick start -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b'
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            shine: {
+              '0%': { backgroundPosition: '0% 50%' },
+              '100%': { backgroundPosition: '100% 50%' }
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(12px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
+          },
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            shine: 'shine 2.5s linear infinite',
+            fadeUp: 'fadeUp .7s ease-out both',
+            'spin-slow': 'spin 8s linear infinite'
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+
+<body class="min-h-screen bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+  <!-- Skip to content -->
+  <a href="#main"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-brand-600 text-white px-3 py-2 rounded">Skip
+    to content</a>
+
+  <!-- Header / Nav -->
+  <header
+    class="fixed top-0 left-0 right-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-slate-900/70 border-b border-slate-200/60 dark:border-slate-700/60">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <!-- Brand -->
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-md bg-brand-700 grid place-items-center shadow-soft">
+            <!-- Simple placeholder logo -->
+            <svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" fill="#ffffff" />
+              <path d="M12 6l3 3-6 6-3-3z" fill="#ef4444" opacity="0.9" />
+            </svg>
+          </div>
+          <div class="hidden sm:flex items-center gap-3">
+            <span class="tracking-[0.35em] font-semibold text-brand-700">A R S</span>
+            <span class="h-6 w-px bg-pink-200"></span>
+            <span class="text-sm text-slate-600 dark:text-slate-300">Traffic &amp; Transport Technology</span>
+          </div>
+        </div>
+
+        <!-- Desktop nav -->
+        <nav class="hidden lg:flex items-center gap-6 text-sm">
+          <a href="#" class="text-brand-700 font-semibold">Home</a>
+          <a href="#about" class="hover:text-brand-700">About</a>
+          <a id="solutionsToggle" href="#solutions" aria-expanded="false"
+            class="hover:text-brand-700 inline-flex items-center gap-1">Solutions
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+              class="h-4 w-4 text-slate-400">
+              <path fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                clip-rule="evenodd" />
+            </svg>
+          </a>
+          <a href="#partnership" class="hover:text-brand-700">Partnership</a>
+          <a href="#news" class="hover:text-brand-700">News</a>
+          <a href="#careers" class="hover:text-brand-700">Careers</a>
+          <a href="#contact" class="hover:text-brand-700">Contact</a>
+        </nav>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Theme toggle (restored) -->
+          <button id="themeToggle"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label="Toggle dark mode">
+            <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              class="h-5 w-5 hidden dark:block">
+              <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
+              <path fill-rule="evenodd"
+                d="M12 2.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V3A.75.75 0 0112 2.25zm0 16.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V19.5a.75.75 0 01.75-.75zM4.47 4.47a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06L4.47 5.53a.75.75 0 010-1.06zm12.94 12.94a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM2.25 12a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H3A.75.75 0 012.25 12zm16.5 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM4.47 19.53a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06L5.53 19.53a.75.75 0 01-1.06 0zm12.94-12.94a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06 1.06a.75.75 0 01-1.06 0z"
+                clip-rule="evenodd" />
+            </svg>
+            <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+              class="h-5 w-5 dark:hidden">
+              <path
+                d="M21.752 15.002A9.718 9.718 0 0112 21.75 9.75 9.75 0 1112 2.25c.668 0 1.318.07 1.944.204a.75.75 0 01.211 1.383A8.25 8.25 0 0019.5 12c0 1.908-.645 3.66-1.724 5.052a.75.75 0 01-1.383-.211c.134-.626.204-1.276.204-1.944 0-2.657-1.282-5.002-3.255-6.498a.75.75 0 01.26-1.33A8.25 8.25 0 0021.35 12a9.7 9.7 0 01-.225 3.002h.627z" />
+            </svg>
+          </button>
+          <a href="https://www.linkedin.com/company/ars-traffic-&-transport-technology" aria-label="LinkedIn"
+            class="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#0a66c2] text-white shadow-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+              <path
+                d="M19 0H5C2.239 0 0 2.239 0 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5V5c0-2.761-2.239-5-5-5zM8.339 18.667H5.667V9.333h2.672v9.334zM7.003 8.139a1.55 1.55 0 110-3.1 1.55 1.55 0 010 3.1zM18.667 18.667h-2.667v-4.699c0-1.121-.02-2.563-1.561-2.563-1.562 0-1.801 1.22-1.801 2.481v4.781H9.97V9.333h2.561v1.274h.035c.356-.674 1.226-1.386 2.525-1.386 2.7 0 3.2 1.777 3.2 4.089v5.357z" />
+            </svg>
+          </a>
+          <!-- Mobile menu button -->
+          <button id="menuBtn"
+            class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label="Toggle menu" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile nav -->
+      <nav id="mobileNav" class="lg:hidden hidden py-3 border-t border-slate-200/60 dark:border-slate-700/60">
+        <a href="#" class="block py-2 text-brand-700 font-semibold">Home</a>
+        <a href="#about" class="block py-2 hover:text-brand-700">About</a>
+        <a href="#solutions" class="block py-2 hover:text-brand-700">Solutions</a>
+        <a href="#partnership" class="block py-2 hover:text-brand-700">Partnership</a>
+        <a href="#news" class="block py-2 hover:text-brand-700">News</a>
+        <a href="#careers" class="block py-2 hover:text-brand-700">Careers</a>
+        <a href="#contact" class="block py-2 hover:text-brand-700">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <!-- Solutions Mega Menu Panel (fixed under header) -->
+  <div id="solutionsPanel"
+    class="hidden fixed left-0 right-0 top-16 z-30 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200/60 dark:border-slate-700/60 shadow-lg">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Column 1 -->
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Traffic Management &amp; Information</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">ORBIS Data Warehouse</a></li>
+              <li><a class="hover:text-brand-700" href="#">ORBIS Incident Detection</a></li>
+              <li><a class="hover:text-brand-700" href="#">ORBIS Sensors</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Traffic Enforcement</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">Restricted Zone</a></li>
+              <li><a class="hover:text-brand-700" href="#">Average Speed Enforcement</a></li>
+              <li><a class="hover:text-brand-700" href="#">Weigh-in-Motion</a></li>
+              <li><a class="hover:text-brand-700" href="#">Spot Speed &amp; Red Light Enforcement</a></li>
+              <li><a class="hover:text-brand-700" href="#">Clean Air Zone</a></li>
+              <li><a class="hover:text-brand-700" href="#">SCAPEYE Vision Analytics</a></li>
+              <li><a class="hover:text-brand-700" href="#">Railway Crossing</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Smart Parking</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">Parking Enforcement</a></li>
+              <li><a class="hover:text-brand-700" href="#">Digital Permits</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Planning &amp; Logistics</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">LYNCXX Fleet Management</a></li>
+              <li><a class="hover:text-brand-700" href="#">LYNCXX Special Transport Planner</a></li>
+              <li><a class="hover:text-brand-700" href="#">LYNCXX Waste Management</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Column 3 -->
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Public Transport</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">Passenger Information Display Systems</a></li>
+              <li><a class="hover:text-brand-700" href="#">Dynamic Bus Platform Allocation</a></li>
+              <li><a class="hover:text-brand-700" href="#">Public Transport Insight Management</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide text-rose-600">Marine Technology</h3>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li><a class="hover:text-brand-700" href="#">Marine Traffic Management System</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <main id="main" class="pt-16">
+    <!-- Anniversary Hero -->
+    <section class="relative overflow-hidden">
+      <div
+        class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-50 via-white to-white dark:from-slate-800 dark:via-slate-900 dark:to-slate-900">
+      </div>
+      <!-- Decorative blobs -->
+      <div class="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-300/30 blur-3xl">
+      </div>
+      <div class="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-teal-300/20 blur-3xl">
+      </div>
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28">
+        <div class="grid items-center gap-10 lg:grid-cols-12">
+          <!-- Text -->
+          <div class="lg:col-span-7">
+            <span
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-3 py-1 text-xs text-slate-600 dark:text-slate-300 animate-fadeUp">
+              <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+              25th Anniversary • Since 2001
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight animate-fadeUp [animation-delay:120ms]">
+              Celebrating
+              <span
+                class="bg-gradient-to-r from-brand-700 via-emerald-400 to-teal-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-shine">
+                25 Years
+              </span>
+              of Traffic &amp; Transport Innovation
+            </h1>
+            <p class="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl animate-fadeUp [animation-delay:220ms]">
+              Thank you to our partners, customers, and team. Together, we’ve
+              advanced safer, smarter mobility across cities and seas.
+            </p>
+            <div class="mt-6 flex flex-wrap items-center gap-3 animate-fadeUp [animation-delay:320ms]">
+              <a href="#solutions"
+                class="inline-flex items-center gap-2 rounded-md bg-brand-600 px-5 py-2.5 text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
+                Explore Solutions
+              </a>
+              <a href="#about"
+                class="inline-flex items-center gap-2 rounded-md border border-slate-300 dark:border-slate-700 px-5 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800">
+                About Us
+              </a>
+            </div>
+          </div>
+
+          <!-- Visual -->
+          <div class="lg:col-span-5">
+            <div class="relative mx-auto max-w-md">
+              <!-- Ambient glow -->
+              <div
+                class="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-emerald-300/40 via-teal-400/30 to-brand-600/30 blur-xl">
+              </div>
+              <div
+                class="relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/70 shadow-soft overflow-hidden">
+                <!-- Header accent strip -->
+                <div class="h-1 w-full bg-gradient-to-r from-brand-600 via-emerald-500 to-teal-500"></div>
+                <div class="p-6">
+                  <div
+                    class="relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-emerald-50 dark:from-slate-900 dark:to-slate-800">
+                    <!-- Pure SVG traffic system animation -->
+                    <svg viewBox="0 0 200 200" role="img"
+                      aria-label="Animated intelligent traffic system: vehicles move along roads and respond to traffic lights"
+                      class="absolute inset-0 h-full w-full">
+                      <style>
+                        @keyframes driveX {
+                          0% {
+                            transform: translateX(-18px)
+                          }
+
+                          40% {
+                            transform: translateX(82px)
+                          }
+
+                          55% {
+                            transform: translateX(82px)
+                          }
+
+                          100% {
+                            transform: translateX(218px)
+                          }
+                        }
+
+                        @keyframes driveY {
+                          0% {
+                            transform: translateY(-18px)
+                          }
+
+                          42% {
+                            transform: translateY(90px)
+                          }
+
+                          60% {
+                            transform: translateY(90px)
+                          }
+
+                          100% {
+                            transform: translateY(218px)
+                          }
+                        }
+
+                        @keyframes lightCycle {
+
+                          0%,
+                          35% {
+                            fill: #dc2626
+                          }
+
+                          40%,
+                          75% {
+                            fill: #16a34a
+                          }
+
+                          80%,
+                          100% {
+                            fill: #facc15
+                          }
+                        }
+
+                        @keyframes pulse {
+
+                          0%,
+                          100% {
+                            opacity: .55
+                          }
+
+                          50% {
+                            opacity: .9
+                          }
+                        }
+
+                        .veh-x {
+                          animation: driveX 6.5s linear infinite
+                        }
+
+                        .veh-x.delayed {
+                          animation-delay: 1.4s
+                        }
+
+                        .veh-y {
+                          animation: driveY 7.2s linear infinite
+                        }
+
+                        .veh-y.delayed {
+                          animation-delay: 2s
+                        }
+
+                        .tl {
+                          animation: lightCycle 7.5s linear infinite
+                        }
+
+                        .node {
+                          animation: pulse 3.2s ease-in-out infinite
+                        }
+
+                        @media (prefers-reduced-motion: reduce) {
+
+                          .veh-x,
+                          .veh-y,
+                          .tl,
+                          .node {
+                            animation: none
+                          }
+                        }
+                      </style>
+                      <!-- Roads background -->
+                      <rect x="0" y="95" width="200" height="30" fill="#0f172a" opacity="0.07" />
+                      <rect x="85" y="0" width="30" height="200" fill="#0f172a" opacity="0.07" />
+                      <!-- Road outlines -->
+                      <g stroke="#065f46" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.85">
+                        <line x1="10" y1="110" x2="190" y2="110" />
+                        <line x1="100" y1="10" x2="100" y2="190" />
+                      </g>
+                      <!-- Lane dashes -->
+                      <g stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.7">
+                        <line x1="10" y1="110" x2="190" y2="110" />
+                        <line x1="100" y1="10" x2="100" y2="190" />
+                      </g>
+                      <!-- Traffic lights at intersection -->
+                      <g>
+                        <circle class="tl" cx="112" cy="98" r="5" />
+                        <circle class="tl" cx="88" cy="122" r="5" style="animation-delay:1.5s" />
+                        <circle class="tl" cx="112" cy="122" r="5" style="animation-delay:3.2s" />
+                        <circle class="tl" cx="88" cy="98" r="5" style="animation-delay:4.7s" />
+                      </g>
+                      <!-- Vehicles horizontal -->
+                      <g fill="#34d399">
+                        <rect class="veh-x" x="0" y="104" width="14" height="12" rx="3" />
+                        <rect class="veh-x delayed" x="0" y="116" width="14" height="12" rx="3" fill="#0d9488" />
+                      </g>
+                      <!-- Vehicles vertical -->
+                      <g fill="#10b981">
+                        <rect class="veh-y" x="94" y="0" width="12" height="14" rx="3" />
+                        <rect class="veh-y delayed" x="106" y="0" width="12" height="14" rx="3" fill="#34d399" />
+                      </g>
+                      <!-- Network nodes (pulsing) -->
+                      <g fill="#059669" opacity="0.9">
+                        <circle class="node" cx="40" cy="110" r="4" />
+                        <circle class="node" cx="160" cy="110" r="4" style="animation-delay:1s" />
+                        <circle class="node" cx="100" cy="60" r="4" style="animation-delay:2.1s" />
+                        <circle class="node" cx="100" cy="160" r="4" style="animation-delay:3.1s" />
+                      </g>
+                      <!-- Caption plate -->
+                      <rect x="20" y="150" width="160" height="36" rx="8" fill="#0f172a" opacity="0.55" />
+                      <text x="100" y="165" text-anchor="middle" font-size="11" fill="#e2e8f0"
+                        font-weight="600">Adaptive Traffic Control</text>
+                      <text x="100" y="178" text-anchor="middle" font-size="9" fill="#94a3b8">Signals • Flow •
+                        Optimization</text>
+                    </svg>
+                    <p class="sr-only">Animated diagram: vehicles travel horizontally and vertically, pause at
+                      intersection when lights are red; lights cycle red, green, amber indicating adaptive control.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- About -->
+    <section id="about"
+      class="relative py-20 sm:py-28 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(16,185,129,0.15),transparent_70%)]">
+      </div>
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative">
+        <div class="grid lg:grid-cols-12 gap-12">
+          <!-- Text Content -->
+          <div class="lg:col-span-7 animate-fadeUp">
+            <h2
+              class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 via-emerald-600 to-teal-500 bg-clip-text text-transparent">
+              About the company
+            </h2>
+            <div class="mt-6 space-y-5 text-slate-700 dark:text-slate-300 leading-relaxed text-[15px]">
+              <p>ARS Traffic &amp; Transport Technology (ARS T&amp;TT), headquartered in the Netherlands has been
+                providing Intelligent traffic and transport technology solutions to businesses and government bodies for
+                over 24 years. We are an active player in our home market of the Netherlands, with special focus on the
+                international emerging traffic and transport technology needs.</p>
+              <p>Our mission as an independent ‘Intelligent Transport System’ (ITS) solutions provider is to rapidly
+                expand the leading position in the fast-growing smart traffic and transportation markets. The unwavering
+                focus on continuous innovation enables us to achieve this mission.</p>
+            </div>
+            <!-- Metrics block removed per user request -->
+          </div>
+          <!-- Accent / Illustration -->
+          <div class="lg:col-span-5 animate-fadeUp [animation-delay:160ms]">
+            <div class="relative group">
+              <!-- Outer animated glow -->
+              <div
+                class="absolute -inset-3 rounded-3xl bg-gradient-to-br from-emerald-300/30 via-teal-400/30 to-brand-500/30 opacity-70 blur-xl transition group-hover:opacity-90">
+              </div>
+              <!-- Rotated decorative rings -->
+              <div class="pointer-events-none absolute inset-0">
+                <div
+                  class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[420px] w-[420px] rounded-full border border-emerald-300/30 animate-spin-slow">
+                </div>
+                <div
+                  class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[360px] w-[360px] rounded-full border border-teal-400/30">
+                </div>
+              </div>
+              <!-- Main Card Stack -->
+              <div
+                class="relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 backdrop-blur-sm shadow-soft overflow-hidden">
+                <!-- Image focus -->
+                <div class="h-1 w-full bg-gradient-to-r from-brand-600 via-teal-500 to-emerald-500"></div>
+                <div class="p-6">
+                  <div class="relative aspect-[5/4] w-full overflow-hidden rounded-xl">
+                    <img src="./assets/img/transport-hub.jpg"
+                      alt="3D render of integrated intelligent transport network with highway, urban roads, vehicles, sensors and control gantries"
+                      class="h-full w-full object-cover object-center select-none" loading="lazy" />
+                    <!-- Overlay gradient for readability in dark & light -->
+                    <div
+                      class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/0 to-transparent dark:from-slate-900/80">
+                    </div>
+                    <!-- Caption -->
+                    <div class="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between">
+                      <div>
+                        <h3 class="text-sm font-semibold text-white tracking-wide">Intelligent Transport In Action</h3>
+                        <p class="mt-1 text-[11px] text-slate-200">Data-driven optimisation • Safety • Sustainability
+                        </p>
+                      </div>
+                      <span
+                        class="inline-flex items-center gap-1 rounded-md bg-white/10 backdrop-blur px-2 py-1 text-[10px] font-medium text-slate-100 ring-1 ring-white/20">Vision
+                        2025</span>
+                    </div>
+                  </div>
+                  <!-- Optional small badges under image -->
+                  <div
+                    class="mt-4 flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    <span
+                      class="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-700/60 px-2 py-1 rounded-md"><span
+                        class="h-2 w-2 rounded-full bg-emerald-500"></span>Real-Time</span>
+                    <span
+                      class="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-700/60 px-2 py-1 rounded-md"><span
+                        class="h-2 w-2 rounded-full bg-teal-500"></span>Predictive</span>
+                    <span
+                      class="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-700/60 px-2 py-1 rounded-md"><span
+                        class="h-2 w-2 rounded-full bg-brand-600"></span>Scalable</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Our Solutions -->
+    <section id="solutions"
+      class="relative py-20 sm:py-24 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_85%_75%,rgba(16,185,129,0.18),transparent_70%)]">
+      </div>
+      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+            Our solutions</h2>
+          <p class="mt-4 text-slate-600 dark:text-slate-300 text-sm sm:text-base">Integrated, data-driven platforms and
+            products that enhance safety, efficiency and sustainability across every transport domain.</p>
+        </div>
+        <div class="mt-12 grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Card: Traffic Management & Information -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Traffic-management-and-information.jpg"
+              alt="Highway traffic light trails representing intelligent flow management"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/80 via-emerald-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Traffic Management &amp; Information</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">Advanced traffic management systems enable traffic to flow more
+                  efficiently on existing infrastructure.</p>
+                <a href="#" aria-label="Learn more about Traffic Management & Information"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Traffic Enforcement -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Traffic-enforcement-1.jpg"
+              alt="Roadside enforcement camera overlooking multilane roadway"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-teal-900/80 via-teal-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Traffic Enforcement</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">State-of-the-art enforcement systems increase the safety and
+                  efficiency of the road network.</p>
+                <a href="#" aria-label="Learn more about Traffic Enforcement"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Public Transport -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Public-Transport.jpg"
+              alt="Modern tram and passengers symbolizing public transport information systems"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/80 via-emerald-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Public Transport</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">Integrated information display systems and software solutions for
+                  public transport.</p>
+                <a href="#" aria-label="Learn more about Public Transport solutions"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Smart Parking -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Smart-Parking.jpg"
+              alt="Parking area with guidance signage representing smart parking solutions"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-teal-900/80 via-teal-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Smart Parking</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">Innovative parking solutions for on-street parking, guidance and
+                  enforcement.</p>
+                <a href="#" aria-label="Learn more about Smart Parking"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Planning & Logistics -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Planning-and-logistics.jpg"
+              alt="Logistics hub with connected data screens representing planning & logistics"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/80 via-emerald-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Planning &amp; Logistics</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">Solve complex issues in fleet management, route planning and
+                  optimization.</p>
+                <a href="#" aria-label="Learn more about Planning & Logistics"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Marine Technology -->
+          <div
+            class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
+            <img src="/assets/img/Marine-Technology.jpg"
+              alt="Modern vessel navigation bridge representing marine technology solutions"
+              class="absolute inset-0 h-full w-full object-cover object-center select-none" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-b from-teal-900/80 via-teal-900/30 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-950/80 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            </div>
+            <div class="relative z-10 flex flex-col h-full p-6 justify-end">
+              <h3
+                class="text-lg md:text-xl font-semibold tracking-wide text-white drop-shadow transition-transform duration-500 group-hover:-translate-y-1">
+                Marine Technology</h3>
+              <div
+                class="space-y-3 opacity-0 max-h-0 overflow-hidden transition-all duration-500 group-hover:opacity-100 group-hover:max-h-40">
+                <p class="text-sm text-slate-200">Software that optimizes efficiency and safety in the maritime
+                  transport sector.</p>
+                <a href="#" aria-label="Learn more about Marine Technology"
+                  class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900">Know
+                  More <span class="text-lg">→</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Metrics (Animated Counters) -->
+    <section id="metrics"
+      class="relative py-14 sm:py-20 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
+      <div
+        class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_85%_80%,rgba(6,182,212,0.15),transparent_65%)] dark:bg-[radial-gradient(circle_at_25%_30%,rgba(16,185,129,0.18),transparent_65%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,0.22),transparent_70%)]">
+      </div>
+      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-10 sm:gap-14 md:grid-cols-4 text-center">
+          <!-- Projects -->
+          <div class="space-y-2">
+            <p class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <span class="count-up inline-block align-baseline" data-target="100" data-suffix="+"
+                aria-hidden="true">0</span><span class="sr-only">More than 100 Projects</span>
+            </p>
+            <p class="text-sm sm:text-base font-medium">Projects</p>
+          </div>
+          <!-- Countries -->
+          <div class="space-y-2">
+            <p class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <span class="count-up inline-block align-baseline" data-target="8" aria-hidden="true">0</span><span
+                class="sr-only">Operating in 8 Countries</span>
+            </p>
+            <p class="text-sm sm:text-base font-medium">Countries</p>
+          </div>
+          <!-- Years of experience -->
+          <div class="space-y-2">
+            <p class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <span class="count-up inline-block align-baseline" data-target="24" aria-hidden="true">0</span><span
+                class="sr-only">24 Years of experience</span>
+            </p>
+            <p class="text-sm sm:text-base font-medium">Years of experience</p>
+          </div>
+          <!-- Employees -->
+          <div class="space-y-2">
+            <p class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+              <span class="count-up inline-block align-baseline" data-target="350" data-suffix="+"
+                aria-hidden="true">0</span><span class="sr-only">More than 350 Employees</span>
+            </p>
+            <p class="text-sm sm:text-base font-medium">Employees</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Careers -->
+    <section id="careers"
+      class="relative pt-20 sm:pt-24 pb-12 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_80%_75%,rgba(6,182,212,0.15),transparent_65%)] dark:bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.18),transparent_65%),radial-gradient(circle_at_70%_70%,rgba(6,182,212,0.22),transparent_70%)]">
+      </div>
+      <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl animate-fadeUp">
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+            Careers</h2>
+          <div class="mt-6 space-y-5 text-slate-600 dark:text-slate-300 leading-relaxed text-[15px]">
+            <p>We have strong ambitions of becoming an important player in the international Intelligent Transport
+              Systems market. In order to achieve these ambitions we are continuously looking for new colleagues to join
+              our team. We offer exciting opportunities for talented professionals and young talents to work on
+              challenging projects in the area of intelligent traffic and transport, and contribute to resolve complex
+              issues on a national and international level.</p>
+            <p>Ambition, team spirit, flexibility, autonomy and commitment are the key elements we require from our
+              employees.</p>
+          </div>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a href="career.html"
+              class="inline-flex items-center gap-2 rounded-md border border-slate-300 dark:border-slate-700 px-5 py-2.5 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800">View
+              Open Positions</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-0 relative overflow-hidden bg-slate-950 text-slate-50">
+    <!-- Gradient & animated glow background -->
+    <div class="pointer-events-none absolute inset-0">
+      <!-- Base gradient -->
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_80%_120%,rgba(16,185,129,0.5),transparent_65%)] opacity-90">
+      </div>
+      <!-- Animated orb left -->
+      <div class="absolute -left-24 bottom-[-6rem] h-64 w-64 rounded-full bg-emerald-500/25 blur-3xl animate-float">
+      </div>
+      <!-- Animated orb right -->
+      <div
+        class="absolute -right-20 top-[-4rem] h-56 w-56 rounded-full bg-teal-400/25 blur-3xl animate-float [animation-delay:300ms]">
+      </div>
+    </div>
+    <!-- Upper content (shared background all themes) -->
+    <div
+      class="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 border-t border-slate-800/80 shadow-[0_-8px_40px_rgba(15,23,42,0.9)] py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Brand / About -->
+          <div>
+            <div class="flex items-center gap-3">
+              <div class="h-12 w-12 rounded-md bg-brand-600 grid place-items-center shadow-soft ring-2 ring-white/20">
+                <svg viewBox="0 0 24 24" class="h-7 w-7" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="#ffffff" />
+                  <path d="M12 6l3 3-6 6-3-3z" fill="#059669" opacity="0.9" />
+                </svg>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="tracking-[0.35em] font-semibold">A R S</span>
+                <span class="h-6 w-px bg-emerald-200/60"></span>
+                <span class="text-xs font-medium">Traffic &amp; Transport Technology</span>
+              </div>
+            </div>
+            <p class="mt-6 text-sm leading-relaxed text-emerald-50/90">ARS Traffic &amp; Transport Technology has been
+              providing traffic and transport technology solutions to private and public organizations for nearly 24
+              years.</p>
+            <p class="mt-4 text-sm leading-relaxed text-emerald-50/90">It is our mission to provide our customers with
+              cost-effective technology products that optimize the utilization and safety of existing and new
+              infrastructure in the world-wide trend of urbanization and increasing mobility.</p>
+          </div>
+
+          <!-- Company links -->
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-emerald-200">ARS T&amp;TT</h3>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li><a href="#about" class="hover:text-white/90">About</a></li>
+              <li><a href="#news" class="hover:text-white/90">News</a></li>
+              <li><a href="#careers" class="hover:text-white/90">Careers</a></li>
+              <li><a href="#contact" class="hover:text-white/90">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Solutions list -->
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-emerald-200">Our solutions</h3>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li><a href="#solutions" class="hover:text-white/90">Traffic Management &amp; Information</a></li>
+              <li><a href="#solutions" class="hover:text-white/90">Traffic Enforcement</a></li>
+              <li><a href="#solutions" class="hover:text-white/90">Smart Parking</a></li>
+              <li><a href="#solutions" class="hover:text-white/90">Planning &amp; Logistics</a></li>
+              <li><a href="#solutions" class="hover:text-white/90">Public Transport</a></li>
+              <li><a href="#solutions" class="hover:text-white/90">Marine Technology</a></li>
+            </ul>
+          </div>
+
+          <!-- Contact prompt -->
+          <div>
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-emerald-200">Get in touch!</h3>
+            <p class="mt-4 text-sm leading-relaxed text-emerald-50/90">Please do not hesitate to contact us if you’re
+              interested in our solutions or if you have any questions. We are happy to see how we can optimize your
+              specific business needs.</p>
+            <a href="#contact"
+              class="mt-6 inline-flex items-center justify-center rounded-md border border-emerald-200/60 px-5 py-2 text-sm font-semibold hover:bg-emerald-700/30 focus:outline-none focus:ring-2 focus:ring-white/40">Contact
+              Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Lower bar (same background family) -->
+    <div class="relative bg-slate-950/95 text-slate-300 text-sm border-t border-slate-800/80">
+      <div
+        class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="order-1 md:order-none">© <span id="year"></span> ARS T&amp;TT</p>
+        <div class="flex items-center gap-6 order-2 md:order-none">
+          <a href="#" class="hover:text-brand-700 dark:hover:text-slate-50">Algemene voorwaarden</a>
+          <a href="#" class="hover:text-brand-700 dark:hover:text-slate-50">Privacy Statement</a>
+        </div>
+        <a href="https://www.linkedin.com/company/ars-traffic-&-transport-technology" aria-label="LinkedIn"
+          class="order-3 md:order-none inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#0a66c2] text-white shadow-soft">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+            <path
+              d="M19 0H5C2.239 0 0 2.239 0 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5V5c0-2.761-2.239-5-5-5zM8.339 18.667H5.667V9.333h2.672v9.334zM7.003 8.139a1.55 1.55 0 110-3.1 1.55 1.55 0 010 3.1zM18.667 18.667h-2.667v-4.699c0-1.121-.02-2.563-1.561-2.563-1.562 0-1.801 1.22-1.801 2.481v4.781H9.97V9.333h2.561v1.274h.035c.356-.674 1.226-1.386 2.525-1.386 2.7 0 3.2 1.777 3.2 4.089v5.357z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+
+</html>
