@@ -65,6 +65,110 @@
     // Hover/focus interactions
     solToggle.addEventListener('mouseenter', showSolutions);
     solToggle.addEventListener('focus', showSolutions);
+      // Confetti effect on "25 Years" click (lightweight, canvas-based)
+      const confettiTarget = document.getElementById('anniversaryConfetti');
+      if (confettiTarget) {
+        confettiTarget.style.cursor = 'pointer';
+        confettiTarget.setAttribute('title', 'Celebrate!');
+
+        const spawnConfetti = (x, y) => {
+          const canvas = document.createElement('canvas');
+          canvas.style.position = 'fixed';
+          canvas.style.inset = '0';
+          canvas.style.pointerEvents = 'none';
+          canvas.style.zIndex = '9999';
+          document.body.appendChild(canvas);
+          const ctx = canvas.getContext('2d');
+          const dpr = Math.max(1, window.devicePixelRatio || 1);
+          const resize = () => {
+            canvas.width = Math.floor(window.innerWidth * dpr);
+            canvas.height = Math.floor(window.innerHeight * dpr);
+          };
+          resize();
+
+          const colors = ['#10b981', '#34d399', '#14b8a6', '#06b6d4', '#f59e0b', '#ef4444'];
+          const pieces = [];
+          const count = 320; // fuller screen
+          const originX = x * dpr;
+          const originY = y * dpr;
+          // Create multiple origins across the screen for a full-screen burst
+          const origins = [
+            { x: originX, y: originY },
+            { x: canvas.width * 0.25, y: canvas.height * 0.35 },
+            { x: canvas.width * 0.75, y: canvas.height * 0.35 },
+            { x: canvas.width * 0.5, y: canvas.height * 0.2 },
+            { x: canvas.width * 0.5, y: canvas.height * 0.6 }
+          ];
+          for (let i = 0; i < count; i++) {
+            const o = origins[i % origins.length];
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 3 + Math.random() * 6;
+            const size = 2 + Math.random() * 5;
+            pieces.push({
+              x: o.x,
+              y: o.y,
+              vx: Math.cos(angle) * speed * dpr,
+              vy: Math.sin(angle) * speed * dpr - (2 + Math.random() * 2.5) * dpr,
+              size: size * dpr,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              life: 70 + Math.floor(Math.random() * 50),
+              rotation: Math.random() * Math.PI,
+              vr: (Math.random() - 0.5) * 0.25
+            });
+          }
+
+          let frame = 0;
+          const gravity = 0.15 * dpr;
+          const drag = 0.991;
+          const tick = () => {
+            frame++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pieces.forEach(p => {
+              p.vx *= drag;
+              p.vy = p.vy * drag + gravity;
+              p.x += p.vx;
+              p.y += p.vy;
+              p.rotation += p.vr;
+              p.life--;
+              const alpha = Math.max(0, Math.min(1, p.life / 80));
+              ctx.save();
+              ctx.globalAlpha = alpha;
+              ctx.translate(p.x, p.y);
+              ctx.rotate(p.rotation);
+              ctx.fillStyle = p.color;
+              // draw as small rotated rectangles (paper bits)
+              ctx.fillRect(-p.size * 0.6, -p.size * 0.3, p.size * 1.2, p.size * 0.6);
+              ctx.restore();
+            });
+            // remove dead pieces
+            for (let i = pieces.length - 1; i >= 0; i--) {
+              if (pieces[i].life <= 0) pieces.splice(i, 1);
+            }
+            if (pieces.length > 0) {
+              requestAnimationFrame(tick);
+            } else {
+              document.body.removeChild(canvas);
+              window.removeEventListener('resize', resize);
+            }
+          };
+          window.addEventListener('resize', resize);
+          tick();
+        };
+
+        const getClickCenter = (el, evt) => {
+          const rect = el.getBoundingClientRect();
+          const x = evt.clientX ?? rect.left + rect.width / 2;
+          const y = evt.clientY ?? rect.top + rect.height / 2;
+          return { x, y };
+        };
+
+        // Full-screen confetti: spawn from multiple centers regardless of click point
+        confettiTarget.addEventListener('click', (evt) => {
+          const { x, y } = getClickCenter(confettiTarget, evt);
+          spawnConfetti(x, y);
+        });
+      }
+
     solPanel.addEventListener('mouseenter', showSolutions);
 
     solToggle.addEventListener('mouseleave', () => {
