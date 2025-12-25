@@ -2,6 +2,7 @@
   // Persisted dark mode preference
   const storageKey = 'starter:theme';
   const root = document.documentElement;
+  const body = document.body;
   const saved = localStorage.getItem(storageKey);
 
   function applyTheme(mode) {
@@ -25,13 +26,31 @@
     localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
   });
 
+  const lockBodyScroll = (lock) => {
+    if (!body) return;
+    body.classList.toggle('overflow-hidden', !!lock);
+  };
+
   // Mobile menu toggle
   const menuBtn = document.getElementById('menuBtn');
   const mobileNav = document.getElementById('mobileNav');
+  const mobileSolutionsToggle = document.getElementById('mobileSolutionsToggle');
+  const mobileSolutionsPanel = document.getElementById('mobileSolutionsPanel');
+  const mobileSolutionsIcon = document.getElementById('mobileSolutionsIcon');
+
+  const collapseMobileSolutions = () => {
+    if (!mobileSolutionsToggle || !mobileSolutionsPanel) return;
+    mobileSolutionsPanel.classList.add('hidden');
+    mobileSolutionsToggle.setAttribute('aria-expanded', 'false');
+    mobileSolutionsToggle.classList.remove('text-brand-700');
+    mobileSolutionsIcon?.classList.remove('rotate-180');
+  };
   if (menuBtn && mobileNav) {
     menuBtn.addEventListener('click', () => {
       const isHidden = mobileNav.classList.toggle('hidden');
       menuBtn.setAttribute('aria-expanded', String(!isHidden));
+      lockBodyScroll(!isHidden);
+      if (isHidden) collapseMobileSolutions();
     });
 
     // Close on navigation click (mobile)
@@ -39,8 +58,19 @@
       a.addEventListener('click', () => {
         mobileNav.classList.add('hidden');
         menuBtn.setAttribute('aria-expanded', 'false');
+        lockBodyScroll(false);
+        collapseMobileSolutions();
       })
     );
+  }
+
+  if (mobileSolutionsToggle && mobileSolutionsPanel) {
+    mobileSolutionsToggle.addEventListener('click', () => {
+      const isHidden = mobileSolutionsPanel.classList.toggle('hidden');
+      mobileSolutionsToggle.setAttribute('aria-expanded', String(!isHidden));
+      mobileSolutionsToggle.classList.toggle('text-brand-700', !isHidden);
+      mobileSolutionsIcon?.classList.toggle('rotate-180', !isHidden);
+    });
   }
 
   // Desktop Solutions mega menu
@@ -144,6 +174,7 @@
             for (let i = pieces.length - 1; i >= 0; i--) {
               if (pieces[i].life <= 0) pieces.splice(i, 1);
             }
+
             if (pieces.length > 0) {
               requestAnimationFrame(tick);
             } else {
@@ -298,4 +329,7 @@
     }, { threshold: 0.4 });
     observer.observe(metricsSection);
   }
+
+  // Visual simulation removed per request
+
 })();

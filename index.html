@@ -74,10 +74,7 @@
         <div class="flex items-center gap-3">
           <div class="h-10 w-10 rounded-md bg-brand-700 grid place-items-center shadow-soft">
             <!-- Simple placeholder logo -->
-            <svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
-              <circle cx="12" cy="12" r="9" fill="#ffffff" />
-              <path d="M12 6l3 3-6 6-3-3z" fill="#ef4444" opacity="0.9" />
-            </svg>
+           <img src="assets/img/ARS ICON HQ (1).png" alt="">
           </div>
           <div class="hidden sm:flex items-center gap-3">
             <span class="tracking-[0.35em] font-semibold text-brand-700">A R S</span>
@@ -131,9 +128,25 @@
                 d="M19 0H5C2.239 0 0 2.239 0 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5V5c0-2.761-2.239-5-5-5zM8.339 18.667H5.667V9.333h2.672v9.334zM7.003 8.139a1.55 1.55 0 110-3.1 1.55 1.55 0 010 3.1zM18.667 18.667h-2.667v-4.699c0-1.121-.02-2.563-1.561-2.563-1.562 0-1.801 1.22-1.801 2.481v4.781H9.97V9.333h2.561v1.274h.035c.356-.674 1.226-1.386 2.525-1.386 2.7 0 3.2 1.777 3.2 4.089v5.357z" />
             </svg>
           </a>
+          <a href="https://www.instagram.com/arstrafficin/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"
+            class="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+              <path
+                d="M7.001 2C4.243 2 2 4.243 2 7.001v9.998C2 19.757 4.243 22 7.001 22h9.998C19.757 22 22 19.757 22 17V7.001C22 4.243 19.757 2 17 2zm0 2h9.998C18.667 4 20 5.333 20 7.001V17c0 1.667-1.333 3-3.001 3H7.001C5.333 20 4 18.667 4 17V7.001C4 5.333 5.333 4 7.001 4zM17.5 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
+            </svg>
+          </a>
+          <a href="https://www.facebook.com/arstrafficin" aria-label="Facebook" target="_blank" rel="noopener noreferrer"
+            class="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true"
+              class="h-5 w-5">
+              <path fill="#1877f2" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12z" />
+              <path fill="#fff"
+                d="M15.07 12.36l.45-3.49h-2.82V6.86c0-.95.47-1.88 1.99-1.88h1.54V1.59S14.78 1.2 13.46 1.2c-2.66 0-4.42 1.62-4.42 4.56v2.52H6.29v3.49h2.75v7.55c.55.09 1.11.13 1.67.13.57 0 1.13-.04 1.68-.13v-7.55z" />
+            </svg>
+          </a>
           <!-- Mobile menu button -->
           <button id="menuBtn"
-            class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+  x`          class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
             aria-label="Toggle menu" aria-expanded="false">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="h-5 w-5">
@@ -144,10 +157,70 @@
       </div>
 
       <!-- Mobile nav -->
-      <nav id="mobileNav" class="lg:hidden hidden py-3 border-t border-slate-200/60 dark:border-slate-700/60">
+      <nav id="mobileNav"
+        class="lg:hidden hidden py-3 border-t border-slate-200/60 dark:border-slate-700/60 max-h-[calc(100vh-4rem)] overflow-y-auto pr-2 overscroll-contain">
         <a href="#" class="block py-2 text-brand-700 font-semibold">Home</a>
         <a href="#about" class="block py-2 hover:text-brand-700">About</a>
-        <a href="#solutions" class="block py-2 hover:text-brand-700">Solutions</a>
+        <button type="button" id="mobileSolutionsToggle" aria-expanded="false" aria-controls="mobileSolutionsPanel"
+          class="flex w-full items-center justify-between py-2 text-left font-medium hover:text-brand-700">
+          <span>Solutions</span>
+          <svg id="mobileSolutionsIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+            class="h-4 w-4 text-slate-500 transition-transform duration-200">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div id="mobileSolutionsPanel"
+          class="hidden pl-4 mt-2 space-y-5 text-sm text-slate-600 dark:text-slate-300 border-l border-slate-200/60 dark:border-slate-700/60">
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Traffic Management &amp; Information</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">ORBIS Data Warehouse</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">ORBIS Incident Detection</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">ORBIS Sensors</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Traffic Enforcement</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">Restricted Zone</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Average Speed Enforcement</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Weigh-in-Motion</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Spot Speed &amp; Red Light Enforcement</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Clean Air Zone</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">SCAPEYE Vision Analytics</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Railway Crossing</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Smart Parking</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">Parking Enforcement</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Digital Permits</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Planning &amp; Logistics</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">LYNCXX Fleet Management</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">LYNCXX Special Transport Planner</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">LYNCXX Waste Management</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Public Transport</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">Passenger Information Display Systems</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Dynamic Bus Platform Allocation</a></li>
+              <li><a class="block py-1 hover:text-brand-700" href="#">Public Transport Insight Management</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-xs font-semibold tracking-wide uppercase text-rose-600">Marine Technology</p>
+            <ul class="mt-2 space-y-1">
+              <li><a class="block py-1 hover:text-brand-700" href="#">Marine Traffic Management System</a></li>
+            </ul>
+          </div>
+        </div>
         <a href="#partnership" class="block py-2 hover:text-brand-700">Partnership</a>
         <a href="#news" class="block py-2 hover:text-brand-700">News</a>
         <a href="#careers" class="block py-2 hover:text-brand-700">Careers</a>
@@ -236,6 +309,26 @@
       </div>
       <div class="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-teal-300/20 blur-3xl">
       </div>
+      <!-- Animated background motifs -->
+      <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+        <div
+          class="absolute left-1/2 top-6 h-[520px] w-[520px] -translate-x-1/2 rounded-full border border-emerald-400/30 animate-spin-slow">
+        </div>
+        <div
+          class="absolute left-1/2 top-6 h-[520px] w-[520px] -translate-x-1/2 rounded-full border border-emerald-100/10 animate-[spin_16s_linear_infinite_reverse]">
+        </div>
+        <div class="absolute -right-6 top-8 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl animate-float"></div>
+        <div class="absolute -left-10 bottom-6 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl animate-[float_9s_ease-in-out_infinite]">
+        </div>
+        <span
+          class="absolute left-[18%] top-1/3 inline-flex h-3 w-3 rounded-full bg-emerald-300/70 animate-ping"></span>
+        <span
+          class="absolute right-[22%] top-1/4 inline-flex h-2.5 w-2.5 rounded-full bg-teal-200/80 animate-ping [animation-delay:300ms]"></span>
+        <span
+          class="absolute left-[30%] bottom-[18%] inline-flex h-2 w-2 rounded-full bg-cyan-200/80 animate-ping [animation-delay:600ms]"></span>
+        <div class="absolute inset-x-0 top-1/2 flex justify-center gap-12 text-[9px] font-semibold tracking-[0.65em] text-emerald-300/40">
+        </div>
+      </div>
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28">
         <div class="grid items-center gap-10 lg:grid-cols-12">
           <!-- Text -->
@@ -269,176 +362,6 @@
             </div>
           </div>
 
-          <!-- Visual -->
-          <div class="lg:col-span-5">
-            <div class="relative mx-auto max-w-md">
-              <!-- Ambient glow -->
-              <div
-                class="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-emerald-300/40 via-teal-400/30 to-brand-600/30 blur-xl">
-              </div>
-              <div
-                class="relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/70 shadow-soft overflow-hidden">
-                <!-- Header accent strip -->
-                <div class="h-1 w-full bg-gradient-to-r from-brand-600 via-emerald-500 to-teal-500"></div>
-                <div class="p-6">
-                  <div
-                    class="relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-emerald-50 dark:from-slate-900 dark:to-slate-800">
-                    <!-- Pure SVG traffic system animation -->
-                    <svg viewBox="0 0 200 200" role="img"
-                      aria-label="Animated intelligent traffic system: vehicles move along roads and respond to traffic lights"
-                      class="absolute inset-0 h-full w-full">
-                      <style>
-                        @keyframes driveX {
-                          0% {
-                            transform: translateX(-18px)
-                          }
-
-                          40% {
-                            transform: translateX(82px)
-                          }
-
-                          55% {
-                            transform: translateX(82px)
-                          }
-
-                          100% {
-                            transform: translateX(218px)
-                          }
-                        }
-
-                        @keyframes driveY {
-                          0% {
-                            transform: translateY(-18px)
-                          }
-
-                          42% {
-                            transform: translateY(90px)
-                          }
-
-                          60% {
-                            transform: translateY(90px)
-                          }
-
-                          100% {
-                            transform: translateY(218px)
-                          }
-                        }
-
-                        @keyframes lightCycle {
-
-                          0%,
-                          35% {
-                            fill: #dc2626
-                          }
-
-                          40%,
-                          75% {
-                            fill: #16a34a
-                          }
-
-                          80%,
-                          100% {
-                            fill: #facc15
-                          }
-                        }
-
-                        @keyframes pulse {
-
-                          0%,
-                          100% {
-                            opacity: .55
-                          }
-
-                          50% {
-                            opacity: .9
-                          }
-                        }
-
-                        .veh-x {
-                          animation: driveX 6.5s linear infinite
-                        }
-
-                        .veh-x.delayed {
-                          animation-delay: 1.4s
-                        }
-
-                        .veh-y {
-                          animation: driveY 7.2s linear infinite
-                        }
-
-                        .veh-y.delayed {
-                          animation-delay: 2s
-                        }
-
-                        .tl {
-                          animation: lightCycle 7.5s linear infinite
-                        }
-
-                        .node {
-                          animation: pulse 3.2s ease-in-out infinite
-                        }
-
-                        @media (prefers-reduced-motion: reduce) {
-
-                          .veh-x,
-                          .veh-y,
-                          .tl,
-                          .node {
-                            animation: none
-                          }
-                        }
-                      </style>
-                      <!-- Roads background -->
-                      <rect x="0" y="95" width="200" height="30" fill="#0f172a" opacity="0.07" />
-                      <rect x="85" y="0" width="30" height="200" fill="#0f172a" opacity="0.07" />
-                      <!-- Road outlines -->
-                      <g stroke="#065f46" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.85">
-                        <line x1="10" y1="110" x2="190" y2="110" />
-                        <line x1="100" y1="10" x2="100" y2="190" />
-                      </g>
-                      <!-- Lane dashes -->
-                      <g stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.7">
-                        <line x1="10" y1="110" x2="190" y2="110" />
-                        <line x1="100" y1="10" x2="100" y2="190" />
-                      </g>
-                      <!-- Traffic lights at intersection -->
-                      <g>
-                        <circle class="tl" cx="112" cy="98" r="5" />
-                        <circle class="tl" cx="88" cy="122" r="5" style="animation-delay:1.5s" />
-                        <circle class="tl" cx="112" cy="122" r="5" style="animation-delay:3.2s" />
-                        <circle class="tl" cx="88" cy="98" r="5" style="animation-delay:4.7s" />
-                      </g>
-                      <!-- Vehicles horizontal -->
-                      <g fill="#34d399">
-                        <rect class="veh-x" x="0" y="104" width="14" height="12" rx="3" />
-                        <rect class="veh-x delayed" x="0" y="116" width="14" height="12" rx="3" fill="#0d9488" />
-                      </g>
-                      <!-- Vehicles vertical -->
-                      <g fill="#10b981">
-                        <rect class="veh-y" x="94" y="0" width="12" height="14" rx="3" />
-                        <rect class="veh-y delayed" x="106" y="0" width="12" height="14" rx="3" fill="#34d399" />
-                      </g>
-                      <!-- Network nodes (pulsing) -->
-                      <g fill="#059669" opacity="0.9">
-                        <circle class="node" cx="40" cy="110" r="4" />
-                        <circle class="node" cx="160" cy="110" r="4" style="animation-delay:1s" />
-                        <circle class="node" cx="100" cy="60" r="4" style="animation-delay:2.1s" />
-                        <circle class="node" cx="100" cy="160" r="4" style="animation-delay:3.1s" />
-                      </g>
-                      <!-- Caption plate -->
-                      <rect x="20" y="150" width="160" height="36" rx="8" fill="#0f172a" opacity="0.55" />
-                      <text x="100" y="165" text-anchor="middle" font-size="11" fill="#e2e8f0"
-                        font-weight="600">Adaptive Traffic Control</text>
-                      <text x="100" y="178" text-anchor="middle" font-size="9" fill="#94a3b8">Signals • Flow •
-                        Optimization</text>
-                    </svg>
-                    <p class="sr-only">Animated diagram: vehicles travel horizontally and vertically, pause at
-                      intersection when lights are red; lights cycle red, green, amber indicating adaptive control.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -490,7 +413,7 @@
                 <div class="h-1 w-full bg-gradient-to-r from-brand-600 via-teal-500 to-emerald-500"></div>
                 <div class="p-6">
                   <div class="relative aspect-[5/4] w-full overflow-hidden rounded-xl">
-                    <img src="./assets/img/transport-hub.jpg"
+                    <img src="./assets/img/Transport-hub-hq.png"
                       alt="3D render of integrated intelligent transport network with highway, urban roads, vehicles, sensors and control gantries"
                       class="h-full w-full object-cover object-center select-none" loading="lazy" />
                     <!-- Overlay gradient for readability in dark & light -->
