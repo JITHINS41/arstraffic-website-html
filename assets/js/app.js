@@ -1,30 +1,10 @@
 (function () {
-  // Persisted dark mode preference
-  const storageKey = 'starter:theme';
   const root = document.documentElement;
   const body = document.body;
-  const saved = localStorage.getItem(storageKey);
-
-  function applyTheme(mode) {
-    if (mode === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
-  }
-
-  // Initialize theme: saved -> OS preference -> light
-  if (saved) {
-    applyTheme(saved);
-  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    applyTheme('dark');
-  } else {
-    applyTheme('light');
-  }
-
-  // Toggle dark mode
-  const themeToggle = document.getElementById('themeToggle');
-  themeToggle?.addEventListener('click', () => {
-    const isDark = root.classList.toggle('dark');
-    localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
-  });
+  root.classList.add('dark');
+  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pointerMedia = window.matchMedia('(pointer: fine)');
+  const pointerState = { x: 0, y: 0 };
 
   const lockBodyScroll = (lock) => {
     if (!body) return;
@@ -300,7 +280,7 @@
     const target = parseInt(el.getAttribute('data-target') || '0', 10);
     const suffix = el.getAttribute('data-suffix') || '';
     if (isNaN(target)) return;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReduced = reduceMotionQuery.matches;
     if (prefersReduced) {
       el.textContent = target + suffix;
       return;
@@ -330,6 +310,654 @@
     observer.observe(metricsSection);
   }
 
-  // Visual simulation removed per request
+  function setupPointerTracking() {
+    const updateRootVars = () => {
+      root.style.setProperty('--pointer-x', pointerState.x.toFixed(3));
+      root.style.setProperty('--pointer-y', pointerState.y.toFixed(3));
+    };
+
+    const handlePointerMove = (event) => {
+      pointerState.x = (event.clientX / window.innerWidth - 0.5) * 2;
+      pointerState.y = (event.clientY / window.innerHeight - 0.5) * 2;
+      updateRootVars();
+    };
+
+    const resetPointer = () => {
+      pointerState.x = 0;
+      pointerState.y = 0;
+      updateRootVars();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerleave', resetPointer);
+    if (typeof pointerMedia.addEventListener === 'function') {
+      pointerMedia.addEventListener('change', resetPointer);
+    } else if (typeof pointerMedia.addListener === 'function') {
+      pointerMedia.addListener(resetPointer);
+    }
+
+    updateRootVars();
+  }
+
+  function initPointerParallax() {
+    if (reduceMotionQuery.matches || !pointerMedia.matches) return;
+    const cards = document.querySelectorAll('[data-tilt-card]');
+    if (!cards.length) return;
+
+    let currentX = 0;
+    let currentY = 0;
+    const damp = 0.08;
+
+    const tick = () => {
+      currentX += (pointerState.x - currentX) * damp;
+      currentY += (pointerState.y - currentY) * damp;
+
+      cards.forEach((card) => {
+        const intensity = parseFloat(card.getAttribute('data-tilt-intensity') || '8');
+        card.style.setProperty('--tilt-rotate-x', `${currentY * -intensity}deg`);
+        card.style.setProperty('--tilt-rotate-y', `${currentX * intensity}deg`);
+        card.style.setProperty('--glow-shift-x', `${currentX * 40}px`);
+        card.style.setProperty('--glow-shift-y', `${currentY * 40}px`);
+      });
+
+      requestAnimationFrame(tick);
+    };
+
+    tick();
+  }
+
+  function initThreeBackground() {
+    const canvas = document.getElementById('sceneCanvas');
+    const hasThree = typeof window.THREE !== 'undefined';
+    if (!canvas || !hasThree) return;
+
+    if (reduceMotionQuery.matches) {
+      canvas.remove();
+      return;
+    }
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x010818, 0.012);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 600);
+    camera.position.set(0, 24, 70);
+
+    const ambient = new THREE.AmbientLight(0x4ecdc4, 0.45);
+    scene.add(ambient);
+    const keyLight = new THREE.DirectionalLight(0x3be8ff, 1.1);
+    keyLight.position.set(35, 60, 0);
+    scene.add(keyLight);
+    const rimLight = new THREE.PointLight(0x0f766e, 1.4, 220);
+    rimLight.position.set(-28, 12, -40);
+    scene.add(rimLight);
+
+    const asphalt = new THREE.Mesh(
+      new THREE.PlaneGeometry(460, 460),
+      new THREE.MeshStandardMaterial({ color: 0x030712, metalness: 0.25, roughness: 0.95 })
+    );
+    asphalt.rotation.x = -Math.PI / 2;
+    asphalt.position.y = -22;
+    scene.add(asphalt);
+
+    const guidePlane = new THREE.PlaneGeometry(460, 460, 40, 40);
+    const guideWire = new THREE.WireframeGeometry(guidePlane);
+    const guideMaterial = new THREE.LineBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.32 });
+    const guide = new THREE.LineSegments(guideWire, guideMaterial);
+    guide.rotation.x = -Math.PI / 2;
+    guide.position.y = -21.8;
+    scene.add(guide);
+
+    const corridorCurves = [];
+    const createTrafficCorridor = (points, colorHex, radius = 0.9) => {
+      const curve = new THREE.CatmullRomCurve3(points);
+      const geometry = new THREE.TubeGeometry(curve, 180, radius, 24, false);
+      const material = new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: colorHex,
+        emissiveIntensity: 0.85,
+        transparent: true,
+        opacity: 0.92,
+        metalness: 0.2,
+        roughness: 0.35
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      corridorCurves.push({ curve, mesh });
+      return curve;
+    };
+
+    const corridorA = createTrafficCorridor([
+      new THREE.Vector3(-60, -8, -170),
+      new THREE.Vector3(-38, -6, -110),
+      new THREE.Vector3(-14, -5, -40),
+      new THREE.Vector3(16, -4, 40),
+      new THREE.Vector3(42, -3, 120)
+    ], 0x10b981, 0.85);
+
+    const corridorB = createTrafficCorridor([
+      new THREE.Vector3(70, -6, -200),
+      new THREE.Vector3(50, -5, -130),
+      new THREE.Vector3(4, -3, -30),
+      new THREE.Vector3(-16, -3, 35),
+      new THREE.Vector3(-32, -4, 120),
+      new THREE.Vector3(-18, -4, 180)
+    ], 0x06b6d4, 0.7);
+
+    const corridorC = createTrafficCorridor([
+      new THREE.Vector3(-90, 4, -140),
+      new THREE.Vector3(-40, 5, -30),
+      new THREE.Vector3(0, 6, 60),
+      new THREE.Vector3(48, 7, 140),
+      new THREE.Vector3(88, 8, 230)
+    ], 0xf59e0b, 0.5);
+
+    const corridorD = createTrafficCorridor([
+      new THREE.Vector3(120, -2, -160),
+      new THREE.Vector3(60, -1, -60),
+      new THREE.Vector3(6, 0, 15),
+      new THREE.Vector3(-36, 1, 90),
+      new THREE.Vector3(-72, 3, 180)
+    ], 0xa78bfa, 0.6);
+
+    const vehicleGeometry = new THREE.BoxGeometry(1.6, 0.8, 3.4);
+    const vehicles = [];
+    const deployVehicles = (curve, count, colorHex, speedRange = [0.045, 0.085]) => {
+      for (let i = 0; i < count; i += 1) {
+        const material = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          emissive: colorHex,
+          emissiveIntensity: 0.9,
+          metalness: 0.55,
+          roughness: 0.22
+        });
+        const mesh = new THREE.Mesh(vehicleGeometry, material);
+        mesh.userData = {
+          curve,
+          progress: Math.random(),
+          speed: speedRange[0] + Math.random() * (speedRange[1] - speedRange[0])
+        };
+        scene.add(mesh);
+        vehicles.push(mesh);
+      }
+    };
+
+    deployVehicles(corridorA, 28, 0x34d399, [0.05, 0.095]);
+    deployVehicles(corridorB, 24, 0x06b6d4, [0.045, 0.09]);
+    deployVehicles(corridorC, 18, 0xfbbf24, [0.04, 0.075]);
+    deployVehicles(corridorD, 16, 0xa78bfa, [0.04, 0.08]);
+
+    const laneLines = [];
+    const lanePositions = [-18, -12, -6, 0, 6, 12, 18];
+    lanePositions.forEach((xPos, idx) => {
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(xPos, -21.4, -240),
+        new THREE.Vector3(xPos, -21.4, 180)
+      ]);
+      const material = new THREE.LineDashedMaterial({
+        color: idx % 2 === 0 ? 0xf8fafc : 0x94a3b8,
+        dashSize: 3.2,
+        gapSize: 1.8,
+        linewidth: 1,
+        transparent: true,
+        opacity: 0.5
+      });
+      const line = new THREE.Line(geometry, material);
+      line.computeLineDistances();
+      scene.add(line);
+      laneLines.push({ line, speed: 0.18 + idx * 0.015 });
+    });
+
+    const signalNodes = [];
+    const signalGeometry = new THREE.CylinderGeometry(0.45, 0.45, 6, 18, 1, true);
+    const signalPositions = [
+      [-28, -18.5, -60],
+      [12, -18.5, -15],
+      [-6, -18.5, 25],
+      [26, -18.5, 70],
+      [-24, -18.5, 110]
+    ];
+    signalPositions.forEach((pos, idx) => {
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x0ea5e9,
+        emissive: 0x0ea5e9,
+        emissiveIntensity: 0.45 + idx * 0.05,
+        transparent: true,
+        opacity: 0.65
+      });
+      const mesh = new THREE.Mesh(signalGeometry, material);
+      mesh.position.set(pos[0], pos[1], pos[2]);
+      scene.add(mesh);
+      signalNodes.push(mesh);
+    });
+
+    const telemetryCount = window.innerWidth > 1024 ? 900 : 520;
+    const telemetryGeometry = new THREE.BufferGeometry();
+    const telemetryPositions = new Float32Array(telemetryCount * 3);
+    const telemetrySpeeds = new Float32Array(telemetryCount);
+    for (let i = 0; i < telemetryCount; i += 1) {
+      telemetryPositions[i * 3] = (Math.random() - 0.5) * 200;
+      telemetryPositions[i * 3 + 1] = Math.random() * 30 - 10;
+      telemetryPositions[i * 3 + 2] = -Math.random() * 240;
+      telemetrySpeeds[i] = 20 + Math.random() * 26;
+    }
+    telemetryGeometry.setAttribute('position', new THREE.BufferAttribute(telemetryPositions, 3));
+    const telemetryMaterial = new THREE.PointsMaterial({
+      color: 0xfef3c7,
+      size: 0.85,
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false
+    });
+    const telemetryPoints = new THREE.Points(telemetryGeometry, telemetryMaterial);
+    scene.add(telemetryPoints);
+
+    const aerialPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-60, 20, -120),
+      new THREE.Vector3(-10, 28, -40),
+      new THREE.Vector3(40, 26, 0),
+      new THREE.Vector3(70, 24, 70),
+      new THREE.Vector3(20, 22, 130),
+      new THREE.Vector3(-40, 24, 40)
+    ], true, 'catmullrom', 0.6);
+
+    const aerialPods = [];
+    const podGeometry = new THREE.SphereGeometry(0.9, 24, 24);
+    for (let i = 0; i < 6; i += 1) {
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x93c5fd,
+        emissive: 0x3b82f6,
+        emissiveIntensity: 0.8,
+        metalness: 0.3,
+        roughness: 0.35
+      });
+      const pod = new THREE.Mesh(podGeometry, material);
+      pod.userData = {
+        curve: aerialPath,
+        progress: i / 6,
+        speed: 0.015 + Math.random() * 0.02
+      };
+      scene.add(pod);
+      aerialPods.push(pod);
+    }
+
+    const clock = new THREE.Clock();
+    let animationFrame;
+
+    const animate = () => {
+      const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
+
+      camera.position.x += (pointerState.x * 28 - camera.position.x) * 0.02;
+      camera.position.y += (14 - pointerState.y * 12 - camera.position.y) * 0.02;
+      camera.lookAt(0, 0, 0);
+
+      corridorCurves.forEach(({ mesh }, idx) => {
+        const pulse = 0.78 + Math.sin(elapsed * (0.8 + idx * 0.2)) * 0.12;
+        mesh.material.opacity = pulse;
+        mesh.material.emissiveIntensity = 0.7 + Math.sin(elapsed * (1 + idx * 0.15)) * 0.12;
+      });
+
+      vehicles.forEach((vehicle) => {
+        const data = vehicle.userData;
+        data.progress = (data.progress + delta * data.speed) % 1;
+        const point = data.curve.getPointAt(data.progress);
+        const tangent = data.curve.getTangentAt(data.progress);
+        vehicle.position.copy(point);
+        const lookTarget = point.clone().add(tangent);
+        vehicle.lookAt(lookTarget);
+        vehicle.rotation.x = 0;
+      });
+
+      laneLines.forEach(({ line, speed }) => {
+        line.material.dashOffset -= delta * speed;
+      });
+
+      const telemetryAttr = telemetryGeometry.attributes.position;
+      const telemetryArray = telemetryAttr.array;
+      for (let i = 0; i < telemetryCount; i += 1) {
+        telemetryArray[i * 3 + 2] += telemetrySpeeds[i] * delta;
+        if (telemetryArray[i * 3 + 2] > 90) {
+          telemetryArray[i * 3 + 2] = -240;
+          telemetryArray[i * 3] = (Math.random() - 0.5) * 200;
+          telemetryArray[i * 3 + 1] = Math.random() * 30 - 10;
+        }
+      }
+      telemetryAttr.needsUpdate = true;
+
+      aerialPods.forEach((pod) => {
+        const data = pod.userData;
+        data.progress = (data.progress + delta * data.speed) % 1;
+        const point = data.curve.getPointAt(data.progress);
+        const tangent = data.curve.getTangentAt(data.progress);
+        pod.position.copy(point);
+        pod.lookAt(point.clone().add(tangent));
+      });
+
+      signalNodes.forEach((node, idx) => {
+        const wave = Math.sin(elapsed * (1.4 + idx * 0.17));
+        node.scale.y = 0.85 + Math.abs(wave) * 0.25;
+        node.material.emissiveIntensity = 0.45 + Math.max(0, wave) * 0.55;
+      });
+
+      renderer.render(scene, camera);
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    const handleResize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    };
+    window.addEventListener('resize', handleResize);
+
+    animate();
+  }
+
+  function initTrafficGame() {
+    const canvas = document.getElementById('trafficGame');
+    const statusEl = document.getElementById('trafficStatus');
+    if (!canvas || !statusEl) return;
+
+    if (reduceMotionQuery.matches) {
+      canvas.classList.add('opacity-40');
+      statusEl.textContent = 'Traffic lab disabled because reduced motion is enabled.';
+      const resetBtn = document.getElementById('trafficReset');
+      resetBtn?.setAttribute('disabled', 'true');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const speedEl = document.getElementById('trafficSpeed');
+    const distanceEl = document.getElementById('trafficDistance');
+    const avoidedEl = document.getElementById('trafficAvoided');
+    const collisionsEl = document.getElementById('trafficCollisions');
+    const resetBtn = document.getElementById('trafficReset');
+
+    const lanes = 3;
+    let width = canvas.clientWidth;
+    let height = canvas.clientWidth * 0.6;
+    let laneWidth = width / lanes;
+    let laneGap = 200;
+    const player = { lane: 1, x: 0, y: 0, width: 40, height: 80, targetX: 0 };
+    let enemies = [];
+    const laneCooldowns = new Array(lanes).fill(0);
+    let spawnTimer = 0.4;
+    let speed = 90;
+    let distance = 0;
+    let avoided = 0;
+    let collisions = 0;
+    let running = false;
+    let lastTime = performance.now();
+    const activeKeys = new Set();
+
+    const laneCenter = (lane) => laneWidth * lane + laneWidth / 2;
+    const getCriticalLanes = () => {
+      const blocked = new Set();
+      const depth = laneGap * 0.9;
+      enemies.forEach((enemy) => {
+        if (enemy.y < depth) {
+          blocked.add(enemy.lane);
+        }
+      });
+      return blocked;
+    };
+
+    const updateReadouts = () => {
+      if (speedEl) speedEl.textContent = `${Math.round(speed)} km/h`;
+      if (distanceEl) distanceEl.textContent = `${distance.toFixed(2)} km`;
+      if (avoidedEl) avoidedEl.textContent = String(avoided);
+      if (collisionsEl) collisionsEl.textContent = String(collisions);
+    };
+
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = Math.min(rect.width * 0.62, 420);
+      laneWidth = width / lanes;
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.8);
+      canvas.width = Math.floor(width * ratio);
+      canvas.height = Math.floor(height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      canvas.style.height = `${height}px`;
+      player.width = laneWidth * 0.45;
+      player.height = height * 0.22;
+      player.y = height - player.height - 18;
+      player.targetX = laneCenter(player.lane) - player.width / 2;
+      player.x = player.targetX;
+      laneGap = height * 0.48;
+    };
+
+    const changeLane = (offset) => {
+      const nextLane = Math.min(lanes - 1, Math.max(0, player.lane + offset));
+      if (nextLane === player.lane) return;
+      player.lane = nextLane;
+      player.targetX = laneCenter(player.lane) - player.width / 2;
+    };
+
+    const spawnEnemy = () => {
+      const openLanes = [0, 1, 2].filter((lane) =>
+        laneCooldowns[lane] <= 0 &&
+        !enemies.some((enemy) => enemy.lane === lane && enemy.y < laneGap)
+      );
+      if (!openLanes.length) return false;
+      const criticalLanes = getCriticalLanes();
+      if (criticalLanes.size >= lanes - 1) return false;
+      const laneChoice = openLanes[Math.floor(Math.random() * openLanes.length)];
+      const enemyWidth = laneWidth * (0.38 + Math.random() * 0.15);
+      const enemyHeight = height * (0.18 + Math.random() * 0.05);
+      enemies.push({
+        lane: laneChoice,
+        x: laneCenter(laneChoice) - enemyWidth / 2,
+        y: -enemyHeight - 40,
+        width: enemyWidth,
+        height: enemyHeight,
+        speed: speed * (0.45 + Math.random() * 0.18)
+      });
+      laneCooldowns[laneChoice] = 0.8 + Math.random() * 0.35;
+      return true;
+    };
+
+    const checkCollision = (a, b) => (
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y
+    );
+
+    const resetGame = (resetCollisions = false) => {
+      enemies = [];
+      laneCooldowns.fill(0);
+      spawnTimer = 0.4;
+      speed = 90;
+      distance = 0;
+      avoided = 0;
+      player.lane = 1;
+      player.targetX = laneCenter(player.lane) - player.width / 2;
+      player.x = player.targetX;
+      if (resetCollisions) collisions = 0;
+      running = false;
+      canvas.classList.remove('ring-rose-500/70');
+      statusEl.textContent = 'Press an arrow key to initialize the flow.';
+      updateReadouts();
+    };
+
+    const update = (delta) => {
+      if (!running) return;
+      if (activeKeys.has('ArrowUp')) speed = Math.min(speed + 110 * delta, 180);
+      else if (activeKeys.has('ArrowDown')) speed = Math.max(speed - 150 * delta, 40);
+      else speed += (100 - speed) * delta * 0.6;
+
+      player.x += (player.targetX - player.x) * Math.min(1, delta * 12);
+      distance += (speed / 3600) * delta;
+
+      spawnTimer -= delta;
+      laneCooldowns.forEach((_, idx) => {
+        laneCooldowns[idx] = Math.max(0, laneCooldowns[idx] - delta);
+      });
+      if (spawnTimer <= 0) {
+        const spawned = spawnEnemy();
+        const clampSpeed = Math.min(speed, 160);
+        spawnTimer = spawned
+          ? Math.max(0.3, 0.95 - clampSpeed / 260)
+          : 0.12;
+      }
+
+      let collisionDetected = false;
+      const survivors = [];
+      enemies.forEach((enemy) => {
+        enemy.y += (enemy.speed + speed * 0.35) * delta;
+        if (enemy.y > height + enemy.height) {
+          avoided += 1;
+          return;
+        }
+        if (checkCollision(player, enemy)) {
+          collisionDetected = true;
+        }
+        survivors.push(enemy);
+      });
+      enemies = survivors;
+
+      if (collisionDetected) {
+        collisions += 1;
+        running = false;
+        statusEl.textContent = 'Collision! Press reset or tap an arrow key to try again.';
+        canvas.classList.add('ring-rose-500/70');
+      } else {
+        statusEl.textContent = 'Keep traffic flowing — avoid the red vehicles.';
+      }
+
+      updateReadouts();
+    };
+
+    const drawCar = (x, y, w, h, color) => {
+      const radius = Math.min(14, w * 0.35);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius * 0.8);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius * 0.8);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(15,23,42,0.95)';
+      ctx.fillRect(x + w * 0.18, y + h * 0.12, w * 0.64, h * 0.2);
+      ctx.fillStyle = 'rgba(15,23,42,0.7)';
+      ctx.fillRect(x + w * 0.2, y + h * 0.52, w * 0.6, h * 0.3);
+
+      ctx.fillStyle = 'rgba(15,23,42,0.95)';
+      const wheelHeight = h * 0.12;
+      const wheelWidth = w * 0.18;
+      ctx.fillRect(x + w * 0.05, y + h * 0.2, wheelWidth, wheelHeight);
+      ctx.fillRect(x + w - wheelWidth - w * 0.05, y + h * 0.2, wheelWidth, wheelHeight);
+      ctx.fillRect(x + w * 0.05, y + h - wheelHeight - h * 0.1, wheelWidth, wheelHeight);
+      ctx.fillRect(x + w - wheelWidth - w * 0.05, y + h - wheelHeight - h * 0.1, wheelWidth, wheelHeight);
+
+      ctx.fillStyle = 'rgba(253,224,71,0.8)';
+      ctx.fillRect(x + w * 0.08, y + h * 0.05, w * 0.14, h * 0.08);
+      ctx.fillRect(x + w - w * 0.22, y + h * 0.05, w * 0.14, h * 0.08);
+      ctx.fillStyle = 'rgba(248,113,113,0.9)';
+      ctx.fillRect(x + w * 0.12, y + h - h * 0.12, w * 0.12, h * 0.07);
+      ctx.fillRect(x + w - w * 0.24, y + h - h * 0.12, w * 0.12, h * 0.07);
+    };
+
+    const render = () => {
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, '#010a16');
+      gradient.addColorStop(1, '#0f172a');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      for (let i = 0; i < lanes; i += 1) {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(15,118,110,0.08)' : 'rgba(8,47,73,0.12)';
+        ctx.fillRect(i * laneWidth, 0, laneWidth, height);
+      }
+
+      ctx.strokeStyle = 'rgba(148,163,184,0.35)';
+      ctx.setLineDash([20, 18]);
+      ctx.lineWidth = 2;
+      for (let i = 1; i < lanes; i += 1) {
+        ctx.beginPath();
+        ctx.moveTo(i * laneWidth, 0);
+        ctx.lineTo(i * laneWidth, height);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      drawCar(player.x, player.y, player.width, player.height, '#34d399');
+      enemies.forEach((enemy) => drawCar(enemy.x, enemy.y, enemy.width, enemy.height, '#f87171'));
+
+      ctx.fillStyle = 'rgba(16,185,129,0.08)';
+      ctx.fillRect(0, height - 60, width, 60);
+    };
+
+    const loop = (now) => {
+      const delta = Math.min(0.05, (now - lastTime) / 1000 || 0);
+      lastTime = now;
+      update(delta);
+      render();
+      requestAnimationFrame(loop);
+    };
+
+    const handleKeyDown = (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+      event.preventDefault();
+      if (!running) {
+        resetGame(false);
+        running = true;
+      }
+      if (event.key === 'ArrowLeft' && !event.repeat) changeLane(-1);
+      if (event.key === 'ArrowRight' && !event.repeat) changeLane(1);
+      activeKeys.add(event.key);
+    };
+
+    const handleKeyUp = (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+      event.preventDefault();
+      activeKeys.delete(event.key);
+    };
+
+    canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
+    canvas.addEventListener('keydown', handleKeyDown);
+    canvas.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('focus', () => {
+      if (!running) statusEl.textContent = 'Use arrow keys to weave through live traffic.';
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('blur', () => {
+      if (running) {
+        running = false;
+        statusEl.textContent = 'Paused — click the simulator to continue.';
+      }
+    });
+
+    resetBtn?.addEventListener('click', (event) => {
+      event.preventDefault();
+      resetGame(true);
+      canvas.focus({ preventScroll: true });
+    });
+
+    resizeCanvas();
+    resetGame(true);
+    lastTime = performance.now();
+    render();
+    requestAnimationFrame(loop);
+    setTimeout(() => canvas.focus({ preventScroll: true }), 400);
+  }
+
+  setupPointerTracking();
+  initPointerParallax();
+  initThreeBackground();
+  initTrafficGame();
 
 })();

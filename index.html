@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 
 <head>
   <meta charset="utf-8" />
@@ -43,23 +43,47 @@
             fadeUp: {
               '0%': { opacity: '0', transform: 'translateY(12px)' },
               '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            orbitPulse: {
+              '0%, 100%': { transform: 'scale(0.92)', boxShadow: '0 0 0 0 rgba(5,150,105,0.35)' },
+              '50%': { transform: 'scale(1.08)', boxShadow: '0 0 35px 8px rgba(6,182,212,0.25)' }
+            },
+            signalSweep: {
+              '0%': { backgroundPosition: '0% 50%' },
+              '100%': { backgroundPosition: '200% 50%' }
+            },
+            drift: {
+              '0%, 100%': { transform: 'translate3d(-4px, 0, 0)' },
+              '50%': { transform: 'translate3d(4px, -6px, 0)' }
+            },
+            cardPulse: {
+              '0%': { boxShadow: '0 20px 60px rgba(15,23,42,0.15)', borderColor: 'rgba(255,255,255,0.15)' },
+              '50%': { boxShadow: '0 35px 90px rgba(15,23,42,0.3)', borderColor: 'rgba(52,211,153,0.35)' },
+              '100%': { boxShadow: '0 20px 60px rgba(15,23,42,0.15)', borderColor: 'rgba(255,255,255,0.15)' }
             }
           },
           animation: {
             float: 'float 6s ease-in-out infinite',
             shine: 'shine 2.5s linear infinite',
             fadeUp: 'fadeUp .7s ease-out both',
-            'spin-slow': 'spin 8s linear infinite'
+            'spin-slow': 'spin 8s linear infinite',
+            'orbit-pulse': 'orbitPulse 2.8s ease-in-out infinite',
+            'signal-sweep': 'signalSweep 5s linear infinite',
+            drift: 'drift 7s ease-in-out infinite',
+            'card-pulse': 'cardPulse 9s ease-in-out infinite'
           }
         }
       }
     }
   </script>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
   <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
-
-<body class="min-h-screen bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+ 
+<body class="relative min-h-screen bg-transparent text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+  <canvas id="sceneCanvas" class="fixed inset-0 -z-10 h-full w-full"></canvas>
+  <div id="siteShell" class="relative z-10">
   <!-- Skip to content -->
   <a href="#main"
     class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-brand-600 text-white px-3 py-2 rounded">Skip
@@ -104,23 +128,6 @@
 
         <!-- Actions -->
         <div class="flex items-center gap-3">
-          <!-- Theme toggle (restored) -->
-          <button id="themeToggle"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label="Toggle dark mode">
-            <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-              class="h-5 w-5 hidden dark:block">
-              <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
-              <path fill-rule="evenodd"
-                d="M12 2.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V3A.75.75 0 0112 2.25zm0 16.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V19.5a.75.75 0 01.75-.75zM4.47 4.47a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06L4.47 5.53a.75.75 0 010-1.06zm12.94 12.94a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM2.25 12a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H3A.75.75 0 012.25 12zm16.5 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM4.47 19.53a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06L5.53 19.53a.75.75 0 01-1.06 0zm12.94-12.94a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06 1.06a.75.75 0 01-1.06 0z"
-                clip-rule="evenodd" />
-            </svg>
-            <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-              class="h-5 w-5 dark:hidden">
-              <path
-                d="M21.752 15.002A9.718 9.718 0 0112 21.75 9.75 9.75 0 1112 2.25c.668 0 1.318.07 1.944.204a.75.75 0 01.211 1.383A8.25 8.25 0 0019.5 12c0 1.908-.645 3.66-1.724 5.052a.75.75 0 01-1.383-.211c.134-.626.204-1.276.204-1.944 0-2.657-1.282-5.002-3.255-6.498a.75.75 0 01.26-1.33A8.25 8.25 0 0021.35 12a9.7 9.7 0 01-.225 3.002h.627z" />
-            </svg>
-          </button>
           <a href="https://www.linkedin.com/company/ars-traffic-&-transport-technology" aria-label="LinkedIn"
             class="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#0a66c2] text-white shadow-soft">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
@@ -146,7 +153,7 @@
           </a>
           <!-- Mobile menu button -->
           <button id="menuBtn"
-  x`          class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+            class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
             aria-label="Toggle menu" aria-expanded="false">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="h-5 w-5">
@@ -300,79 +307,61 @@
   <!-- Main content -->
   <main id="main" class="pt-16">
     <!-- Anniversary Hero -->
-    <section class="relative overflow-hidden">
-      <div
-        class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-50 via-white to-white dark:from-slate-800 dark:via-slate-900 dark:to-slate-900">
-      </div>
-      <!-- Decorative blobs -->
-      <div class="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-300/30 blur-3xl">
-      </div>
-      <div class="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-teal-300/20 blur-3xl">
-      </div>
-      <!-- Animated background motifs -->
-      <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div
-          class="absolute left-1/2 top-6 h-[520px] w-[520px] -translate-x-1/2 rounded-full border border-emerald-400/30 animate-spin-slow">
-        </div>
-        <div
-          class="absolute left-1/2 top-6 h-[520px] w-[520px] -translate-x-1/2 rounded-full border border-emerald-100/10 animate-[spin_16s_linear_infinite_reverse]">
-        </div>
-        <div class="absolute -right-6 top-8 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl animate-float"></div>
-        <div class="absolute -left-10 bottom-6 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl animate-[float_9s_ease-in-out_infinite]">
-        </div>
-        <span
-          class="absolute left-[18%] top-1/3 inline-flex h-3 w-3 rounded-full bg-emerald-300/70 animate-ping"></span>
-        <span
-          class="absolute right-[22%] top-1/4 inline-flex h-2.5 w-2.5 rounded-full bg-teal-200/80 animate-ping [animation-delay:300ms]"></span>
-        <span
-          class="absolute left-[30%] bottom-[18%] inline-flex h-2 w-2 rounded-full bg-cyan-200/80 animate-ping [animation-delay:600ms]"></span>
-        <div class="absolute inset-x-0 top-1/2 flex justify-center gap-12 text-[9px] font-semibold tracking-[0.65em] text-emerald-300/40">
-        </div>
-      </div>
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28">
-        <div class="grid items-center gap-10 lg:grid-cols-12">
-          <!-- Text -->
-          <div class="lg:col-span-7">
-            <span
-              class="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-3 py-1 text-xs text-slate-600 dark:text-slate-300 animate-fadeUp">
-              <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-              25th Anniversary • Since 2001
-            </span>
-            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight animate-fadeUp [animation-delay:120ms]">
-              Celebrating
-              <span id="anniversaryConfetti"
-                class="bg-gradient-to-r from-brand-700 via-emerald-400 to-teal-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-shine">
-                25 Years
+    <section class="relative py-16 sm:py-24 lg:py-28">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="7"
+          class="tilt-card rounded-[32px] border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-2xl shadow-[0_40px_120px_rgba(15,23,42,0.35)] px-6 py-10 sm:px-10 lg:px-14 animate-card-pulse">
+          <div class="grid items-center gap-10 lg:grid-cols-12">
+            <!-- Text -->
+            <div class="lg:col-span-7">
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-white/40 dark:border-white/10 px-3 py-1 text-xs text-slate-600 dark:text-slate-300 animate-fadeUp">
+                <span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-orbit-pulse"></span>
+                25th Anniversary • Since 2001
               </span>
-              of Traffic &amp; Transport Innovation
-            </h1>
-            <p class="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl animate-fadeUp [animation-delay:220ms]">
-              Thank you to our partners, customers, and team. Together, we’ve
-              advanced safer, smarter mobility across cities and seas.
-            </p>
-            <div class="mt-6 flex flex-wrap items-center gap-3 animate-fadeUp [animation-delay:320ms]">
-              <a href="#solutions"
-                class="inline-flex items-center gap-2 rounded-md bg-brand-600 px-5 py-2.5 text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
-                Explore Solutions
-              </a>
-              <a href="#about"
-                class="inline-flex items-center gap-2 rounded-md border border-slate-300 dark:border-slate-700 px-5 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800">
-                About Us
-              </a>
+              <h1
+                class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight animate-fadeUp [animation-delay:120ms] text-slate-900 dark:text-white">
+                Celebrating
+                <span id="anniversaryConfetti"
+                  class="bg-gradient-to-r from-brand-700 via-emerald-400 to-teal-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-signal-sweep">
+                  25 Years
+                </span>
+                of Traffic &amp; Transport Innovation
+              </h1>
+              <p class="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl animate-fadeUp [animation-delay:220ms]">
+                Thank you to our partners, customers, and team. Together, we’ve
+                advanced safer, smarter mobility across cities and seas.
+              </p>
+              <div class="mt-6 flex flex-wrap items-center gap-3 animate-fadeUp [animation-delay:320ms]">
+                <a href="#solutions"
+                  class="inline-flex items-center gap-2 rounded-md bg-brand-600 px-5 py-2.5 text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
+                  Explore Solutions
+                </a>
+                <a href="#about"
+                  class="inline-flex items-center gap-2 rounded-md border border-slate-300/70 dark:border-slate-700 px-5 py-2.5 hover:bg-slate-100/80 dark:hover:bg-slate-800">
+                  About Us
+                </a>
+              </div>
+            </div>
+            <!-- Scene visual -->
+            <div class="lg:col-span-5">
+              <div data-tilt-card data-tilt-intensity="4"
+                class="tilt-card rounded-3xl overflow-hidden border border-white/20 bg-transparent dark:bg-transparent shadow-[0_30px_80px_rgba(3,7,18,0.45)] backdrop-blur-xl">
+                <img src="assets/img/25th_logo_gemini.png"
+                  alt="Visualization of ARS transport intelligence network"
+                  class="w-full h-full object-cover">
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </section>
     <!-- About -->
-    <section id="about"
-      class="relative py-20 sm:py-28 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
-      <div
-        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_70%_60%,rgba(16,185,129,0.15),transparent_70%)]">
-      </div>
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative">
-        <div class="grid lg:grid-cols-12 gap-12">
+    <section id="about" class="relative py-20 sm:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="5"
+          class="tilt-card rounded-3xl border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-xl px-6 py-10 sm:px-10 lg:px-12 shadow-soft animate-card-pulse">
+          <div class="grid lg:grid-cols-12 gap-12">
           <!-- Text Content -->
           <div class="lg:col-span-7 animate-fadeUp">
             <h2
@@ -408,7 +397,7 @@
               </div>
               <!-- Main Card Stack -->
               <div
-                class="relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 backdrop-blur-sm shadow-soft overflow-hidden">
+                class="relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-transparent dark:bg-transparent backdrop-blur-sm shadow-soft overflow-hidden">
                 <!-- Image focus -->
                 <div class="h-1 w-full bg-gradient-to-r from-brand-600 via-teal-500 to-emerald-500"></div>
                 <div class="p-6">
@@ -453,20 +442,18 @@
       </div>
     </section>
     <!-- Our Solutions -->
-    <section id="solutions"
-      class="relative py-20 sm:py-24 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
-      <div
-        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_85%_75%,rgba(16,185,129,0.18),transparent_70%)]">
-      </div>
-      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto">
+    <section id="solutions" class="relative py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="4"
+          class="tilt-card rounded-3xl border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-xl px-6 py-12 sm:px-10 lg:px-14 shadow-soft animate-card-pulse">
+          <div class="text-center max-w-2xl mx-auto">
           <h2
             class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
             Our solutions</h2>
           <p class="mt-4 text-slate-600 dark:text-slate-300 text-sm sm:text-base">Integrated, data-driven platforms and
             products that enhance safety, efficiency and sustainability across every transport domain.</p>
-        </div>
-        <div class="mt-12 grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+          </div>
+          <div class="mt-12 grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
           <!-- Card: Traffic Management & Information -->
           <div
             class="group relative rounded-xl overflow-hidden shadow-soft border border-slate-200 dark:border-slate-700 h-72 md:h-80">
@@ -611,17 +598,16 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </section>
     <!-- Metrics (Animated Counters) -->
-    <section id="metrics"
-      class="relative py-14 sm:py-20 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
-      <div
-        class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_85%_80%,rgba(6,182,212,0.15),transparent_65%)] dark:bg-[radial-gradient(circle_at_25%_30%,rgba(16,185,129,0.18),transparent_65%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,0.22),transparent_70%)]">
-      </div>
-      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="grid gap-10 sm:gap-14 md:grid-cols-4 text-center">
+    <section id="metrics" class="relative py-14 sm:py-20">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="4"
+          class="tilt-card rounded-3xl border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-xl px-6 py-12 sm:px-10 shadow-soft animate-card-pulse">
+          <div class="grid gap-10 sm:gap-14 md:grid-cols-4 text-center">
           <!-- Projects -->
           <div class="space-y-2">
             <p class="text-4xl sm:text-5xl font-extrabold tracking-tight">
@@ -654,17 +640,15 @@
             </p>
             <p class="text-sm sm:text-base font-medium">Employees</p>
           </div>
+          </div>
         </div>
       </div>
     </section>
     <!-- Careers -->
-    <section id="careers"
-      class="relative pt-20 sm:pt-24 pb-12 bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-y border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
-      <div
-        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_80%_75%,rgba(6,182,212,0.15),transparent_65%)] dark:bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.18),transparent_65%),radial-gradient(circle_at_70%_70%,rgba(6,182,212,0.22),transparent_70%)]">
-      </div>
-      <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl animate-fadeUp">
+    <section id="careers" class="relative pt-20 sm:pt-24 pb-12">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="6"
+          class="tilt-card rounded-3xl border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-xl px-6 py-10 sm:px-10 shadow-soft animate-fadeUp">
           <h2
             class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
             Careers</h2>
@@ -685,6 +669,60 @@
         </div>
       </div>
     </section>
+
+    <!-- Interactive Traffic Simulator -->
+    <section id="traffic-lab" class="relative py-16 sm:py-24">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div data-tilt-card data-tilt-intensity="5"
+          class="tilt-card rounded-3xl border border-white/15 bg-transparent dark:bg-transparent backdrop-blur-2xl px-6 py-10 sm:px-10 lg:px-12 shadow-soft">
+          <div class="grid lg:grid-cols-5 gap-10">
+            <div class="lg:col-span-2 space-y-5">
+              <div>
+                <p class="text-xs font-semibold tracking-[0.4em] uppercase text-emerald-300">Hands-on lab</p>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-white">Traffic Simulation Game</h2>
+                <p class="mt-3 text-sm text-slate-300">Guide the fleet through adaptive corridors. Use your arrow
+                  keys to change lanes and modulate speed while avoiding oncoming vehicles.</p>
+              </div>
+              <ul class="space-y-2 text-sm text-slate-400">
+                <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>Left / right: switch lanes</li>
+                <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>Up / down: accelerate or damp speed</li>
+                <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>Click the canvas to capture focus before driving</li>
+              </ul>
+              <dl class="mt-6 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <dt class="text-[11px] uppercase tracking-[0.35em] text-slate-500">Speed</dt>
+                  <dd id="trafficSpeed" class="mt-1 text-xl font-semibold text-white">0 km/h</dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] uppercase tracking-[0.35em] text-slate-500">Distance</dt>
+                  <dd id="trafficDistance" class="mt-1 text-xl font-semibold text-white">0.00 km</dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] uppercase tracking-[0.35em] text-slate-500">Avoided</dt>
+                  <dd id="trafficAvoided" class="mt-1 text-xl font-semibold text-white">0</dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] uppercase tracking-[0.35em] text-slate-500">Collisions</dt>
+                  <dd id="trafficCollisions" class="mt-1 text-xl font-semibold text-white">0</dd>
+                </div>
+              </dl>
+            </div>
+            <div class="lg:col-span-3 space-y-4">
+              <canvas id="trafficGame" tabindex="0"
+                class="w-full rounded-[28px] border border-white/15 bg-slate-900/70 ring-1 ring-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-[0_25px_80px_rgba(15,23,42,0.65)] aspect-[12/7]">
+              </canvas>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm">
+                <p id="trafficStatus" class="text-emerald-200">Press an arrow key to initialize the flow.</p>
+                <button id="trafficReset"
+                  class="inline-flex items-center justify-center rounded-md border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-200 hover:bg-white/5">
+                  Reset Run
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
@@ -696,11 +734,11 @@
         class="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_80%_120%,rgba(16,185,129,0.5),transparent_65%)] opacity-90">
       </div>
       <!-- Animated orb left -->
-      <div class="absolute -left-24 bottom-[-6rem] h-64 w-64 rounded-full bg-emerald-500/25 blur-3xl animate-float">
+      <div class="absolute -left-24 bottom-[-6rem] h-64 w-64 rounded-full bg-emerald-500/25 blur-3xl animate-drift">
       </div>
       <!-- Animated orb right -->
       <div
-        class="absolute -right-20 top-[-4rem] h-56 w-56 rounded-full bg-teal-400/25 blur-3xl animate-float [animation-delay:300ms]">
+        class="absolute -right-20 top-[-4rem] h-56 w-56 rounded-full bg-teal-400/25 blur-3xl animate-drift [animation-delay:300ms]">
       </div>
     </div>
     <!-- Upper content (shared background all themes) -->
@@ -711,11 +749,9 @@
           <!-- Brand / About -->
           <div>
             <div class="flex items-center gap-3">
-              <div class="h-12 w-12 rounded-md bg-brand-600 grid place-items-center shadow-soft ring-2 ring-white/20">
-                <svg viewBox="0 0 24 24" class="h-7 w-7" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" fill="#ffffff" />
-                  <path d="M12 6l3 3-6 6-3-3z" fill="#059669" opacity="0.9" />
-                </svg>
+              <div class="h-12 w-12 rounded-md bg-brand-700 grid place-items-center shadow-soft ring-2 ring-white/20">
+                <img src="assets/img/ARS ICON HQ (1).png" alt="ARS Traffic &amp; Transport Technology logo"
+                  class="h-9 w-9 object-contain">
               </div>
               <div class="flex items-center gap-3">
                 <span class="tracking-[0.35em] font-semibold">A R S</span>
@@ -787,6 +823,8 @@
       </div>
     </div>
   </footer>
+
+  </div>
 
   <script src="./assets/js/app.js"></script>
 </body>
